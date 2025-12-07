@@ -1,0 +1,22 @@
+- bands:
+  - Mammoth WVH
+  - Architects
+  - Metallica
+  date: 2024-05-24
+  location: München, Olympiastadion
+- bands:
+  - Fear Factory
+  - Machine Head
+  - The Prodigy
+  date: 2024-06-28
+  festival: true
+  location: Clisson
+  name: Hellfest
+- bands:
+  - Mammoth WVH
+  - Kataklysm
+  - Metallica
+  date: 2024-06-29
+  festival: true
+  location: Clisson
+  name: Hellfest
