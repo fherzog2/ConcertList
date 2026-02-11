@@ -8,7 +8,7 @@ fi
 pip install PyInstaller
 
 SOURCE_DIR=$PWD
-CURRENT_DIR_NAME=$(basename $PWD)
+CURRENT_DIR_NAME=$(basename "$PWD")
 INSTALL_DIR=~/pyinstaller_$CURRENT_DIR_NAME
 mkdir -p $INSTALL_DIR
 cd $INSTALL_DIR
