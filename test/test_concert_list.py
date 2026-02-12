@@ -77,10 +77,10 @@ class TestConcertList(unittest.TestCase):
             model.load_file(filepath)
             info = ConcertListInfo(model)
 
-            self.assertEqual(info.get_number_of_concerts(), 3)
-            self.assertEqual(sorted(info.get_locations()), ['Clisson', 'München, Olympiastadion'])
+            self.assertEqual(info.get_number_of_concerts(), 5)
+            self.assertEqual(sorted(info.get_locations()), ['Clisson', 'Hamburg, Grosse Freiheit 36', 'Hamburg, Gruenspan', 'München, Olympiastadion'])
             self.assertEqual(sorted(info.get_names()), ["Hellfest"])
-            self.assertEqual(sorted(info.get_bands()), ['Architects', 'Fear Factory', 'Kataklysm', 'Machine Head', 'Mammoth WVH', 'Metallica', 'The Prodigy'])
+            self.assertEqual(sorted(info.get_bands()), ['Any Given Day', 'Architects', 'Chaosbay', 'Emil Bulls', 'Fear Factory', 'Flash Forward', 'Kataklysm', 'Machine Head', 'Mammoth WVH', 'Metallica', 'The Prodigy'])
 
         info = ConcertListInfo(ConcertListModel())
 

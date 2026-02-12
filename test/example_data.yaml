@@ -20,3 +20,13 @@
   festival: true
   location: Clisson
   name: Hellfest
+- bands:
+  - Chaosbay
+  - Flash Forward
+  - Emil Bulls
+  date: 2024-02-02
+  location: Hamburg, Grosse Freiheit 36
+- bands:
+  - Any Given Day
+  date: 2024-02-02
+  location: Hamburg, Gruenspan

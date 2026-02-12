@@ -117,7 +117,7 @@ class TestMainWindow(unittest.TestCase):
 
             window.open_file(good_file)
 
-            self.assertEqual(window.concert_list_view.table.rowCount(), 3)
+            self.assertEqual(window.concert_list_view.table.rowCount(), 5)
             self.assertEqual(settings.get_filepath(), good_file)
             self.assertEqual(error_handler.errors, [])
 
@@ -125,7 +125,7 @@ class TestMainWindow(unittest.TestCase):
 
             # expectation: the good content is still loaded after trying to open the bad file
 
-            self.assertEqual(window.concert_list_view.table.rowCount(), 3)
+            self.assertEqual(window.concert_list_view.table.rowCount(), 5)
             self.assertEqual(settings.get_filepath(), good_file)
             self.assertEqual(error_handler.errors, ["ParserError"])
 
@@ -148,7 +148,7 @@ class TestMainWindow(unittest.TestCase):
 
             window.open_file(good_file)
 
-            self.assertEqual(window.concert_list_view.table.rowCount(), 3)
+            self.assertEqual(window.concert_list_view.table.rowCount(), 5)
             self.assertEqual(settings.get_filepath(), good_file)
             self.assertEqual(error_handler.errors, ["ParserError"])
 
@@ -166,7 +166,7 @@ class TestMainWindow(unittest.TestCase):
             settings.set_filepath(good_file)
             window.load_filepath_from_settings()
 
-            self.assertEqual(window.concert_list_view.table.rowCount(), 3)
+            self.assertEqual(window.concert_list_view.table.rowCount(), 5)
             self.assertEqual(settings.get_filepath(), good_file)
             self.assertEqual(error_handler.errors, [])
 

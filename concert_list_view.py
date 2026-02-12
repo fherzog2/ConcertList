@@ -247,19 +247,34 @@ class ConcertListViewGrid(QFrame):
     def set_model(self, concert_list_model: concert_list.ConcertListModel):
         values = []
 
-        for concert in concert_list_model.get_concerts():
-            tooltip_lines = [format_date(concert.date)]
-            if len(concert.name) > 0:
-                tooltip_lines.append(concert.name)
-            tooltip_lines.append(concert.location)
-            tooltip_lines.append("")
-            tooltip_lines += concert.bands
+        class GridValue:
+            def __init__(self, concert: concert_list.Concert):
+                self.bands = 0
+                self.tooltip = []
 
-            tooltip = "\n".join(tooltip_lines)
-            value = dates_grid_view.DateGridValue(concert.date, len(concert.bands), tooltip)
+        grid_values: dict[datetime.date, GridValue] = dict()
+
+        for concert in concert_list_model.get_concerts():
+            date = concert.date
+            grid_values[date] = grid_values.get(date, GridValue(concert))
+            grid_values[date].bands += len(concert.bands)
+            grid_values[date].tooltip.append(self.create_tooltip(concert))
+
+        for date, value in grid_values.items():
+            value = dates_grid_view.DateGridValue(date, value.bands, "\n\n".join(value.tooltip))
             values.append(value)
 
         self.grid_view.set_values(values)
+
+    def create_tooltip(self, concert: concert_list.Concert):
+        tooltip_lines = [format_date(concert.date)]
+        if len(concert.name) > 0:
+            tooltip_lines.append(concert.name)
+        tooltip_lines.append(concert.location)
+        tooltip_lines.append("")
+        tooltip_lines += concert.bands
+
+        return "\n".join(tooltip_lines)
 
     def dump(self):
         if self.grid_view.isVisibleTo(self):
