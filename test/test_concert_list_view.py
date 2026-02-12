@@ -54,15 +54,15 @@ class TestConcertListView(unittest.TestCase):
         expected = r"""Band;Times Seen
 Mammoth WVH;2
 Metallica;2
+Any Given Day;1
 Architects;1
-Fear Factory;1
-Machine Head;1
-The Prodigy;1
-Kataklysm;1
 Chaosbay;1
-Flash Forward;1
 Emil Bulls;1
-Any Given Day;1"""
+Fear Factory;1
+Flash Forward;1
+Kataklysm;1
+Machine Head;1
+The Prodigy;1"""
         self.assertEqual(app.view.dump(), expected)
 
     def test_concerts_per_year(self):

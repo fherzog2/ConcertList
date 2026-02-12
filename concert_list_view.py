@@ -72,6 +72,9 @@ class ConcertListView(QFrame):
         self.table.sortItems(sort_column, sort_order)
         self.table.setSortingEnabled(True)
 
+    def sort_table(self, sort_column: int, sort_order: Qt.SortOrder):
+        self.table.sortItems(sort_column, sort_order)
+
     def dump(self):
         rows = []
         if self.table.isVisibleTo(self):
@@ -129,7 +132,11 @@ class ConcertListViewMostSeenBands(ConcertListView):
         for band, times in times_seen.items():
             data.append([band, times])
 
-        self.rebuild_table(["Band", "Times Seen"], data, 1, Qt.SortOrder.DescendingOrder)
+        # primarily sort by times seen
+        # but also sort by band names within each group
+
+        self.rebuild_table(["Band", "Times Seen"], data, 0, Qt.SortOrder.AscendingOrder)
+        self.sort_table(1, Qt.SortOrder.DescendingOrder)
 
 
 class ConcertListViewConcertsPerYear(ConcertListView):
