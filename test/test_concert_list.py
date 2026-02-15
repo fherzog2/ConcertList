@@ -15,11 +15,27 @@ class TestConcertList(unittest.TestCase):
 
     def test_unicode(self):
         data = """- bands:
-  - äöüÄÖÜéㅍ
+  - äöüÄÖÜ
+  - 漢字
+  - 한국어
+  - 𓀀 𓀄 𓀘 𓀢 𓀬
   date: 2010-02-03
   location: Berlin
 """
+
+        # data must stay the same after converting from and to str
+
         self.assertEqual(dump_concerts(load_concerts(data)), data)
+
+        # data must stay the same after writing and reading file
+
+        with tempfile.TemporaryDirectory() as tmpdirname:
+            filepath = os.path.join(tmpdirname, "concerts.yaml")
+            safe_write_file(filepath, data)
+
+            with open(filepath, "r", encoding="utf8") as f:
+                content = f.read()
+                self.assertEqual(content, data)
 
     def test_add_to_file(self):
         concert = create_concert(datetime.date(2012, 12, 1), "Location", ["Band 1", "Band 2"])

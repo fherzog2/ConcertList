@@ -2,6 +2,7 @@ import yaml
 import os
 import datetime
 from typing import Any
+from PyQt6.QtCore import *
 
 
 class Concert:
@@ -94,19 +95,10 @@ def load_concerts(data):
 
 
 def safe_write_file(filepath: str, content):
-    if os.path.exists(filepath):
-        filepath_tmp = filepath + ".tmp"
-        filepath_bak = filepath + ".bak"
-
-        with open(filepath_tmp, "w", encoding="utf8") as f:
-            f.write(content)
-
-        os.rename(filepath, filepath_bak)
-        os.rename(filepath_tmp, filepath)
-        os.remove(filepath_bak)
-    else:
-        with open(filepath, "w", encoding="utf8") as f:
-            f.write(content)
+    file = QSaveFile(filepath)
+    file.open(QSaveFile.OpenModeFlag.WriteOnly)
+    file.write(content.encode("utf8"))
+    file.commit()
 
 
 def add_concert_to_file(filepath: str, concert: dict[str, Any]):
