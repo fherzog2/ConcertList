@@ -10,12 +10,12 @@ class TestDatesGridView(unittest.TestCase):
 
         grid = dates_grid_view.DatesGridView(None)
 
-        values = []
+        grid_model = dates_grid_view.DatesGridModel()
 
         for year in range(2020, 2026):
-            values.append(dates_grid_view.DateGridValue(datetime.date(year, 1, 1), 1, ""))
+            grid_model.add_value(datetime.date(year, 1, 1), 1, "")
 
-        grid.set_values(values)
+        grid.set_values(grid_model)
 
         with self.subTest(msg='2021'):
             grid.show_year(2021)
@@ -59,3 +59,28 @@ Column 1 has gaps: [None, None, '2025-01-01', '2025-01-02', '2025-01-03', '2025-
 Column 53 has gaps: ['2025-12-29', '2025-12-30', '2025-12-31', None, None, None, None]
 Item at (1,2), value: 1, date: 2025-01-01"""
             self.assertEqual(grid.dump(), expected)
+
+    def test_grid_set_and_clear(self):
+        app = QApplication([])
+
+        grid = dates_grid_view.DatesGridView(None)
+
+        grid_model_1 = dates_grid_view.DatesGridModel()
+        grid_model_1.add_value(datetime.date(2020, 1, 1), 1, "")
+        grid.set_values(grid_model_1)
+
+        expected_1 = r"""Year 2020
+54 columns, 7 rows
+Column 1 has gaps: [None, None, '2020-01-01', '2020-01-02', '2020-01-03', '2020-01-04', '2020-01-05']
+Column 53 has gaps: ['2020-12-28', '2020-12-29', '2020-12-30', '2020-12-31', None, None, None]
+Item at (1,2), value: 1, date: 2020-01-01"""
+        self.assertEqual(grid.dump(), expected_1)
+
+        grid_model_empty = dates_grid_view.DatesGridModel()
+        grid.set_values(grid_model_empty)
+
+        expected_empty = r"""Year None"""
+        self.assertEqual(grid.dump(), expected_empty)
+
+        grid.set_values(grid_model_1)
+        self.assertEqual(grid.dump(), expected_1)
