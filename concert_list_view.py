@@ -1,6 +1,7 @@
 from PyQt6.QtCore import *
 from PyQt6.QtWidgets import *
 import concert_list
+import collections
 import dates_grid_view
 import datetime
 
@@ -122,11 +123,11 @@ class ConcertListViewMostSeenBands(ConcertListView):
         super().__init__(parent)
 
     def set_model(self, concert_list_model: concert_list.ConcertListModel):
-        times_seen = dict()
+        times_seen = collections.defaultdict(int)
 
         for concert in concert_list_model.get_concerts():
             for band in concert.bands:
-                times_seen[band] = times_seen.get(band, 0) + 1
+                times_seen[band] += 1
 
         data = []
         for band, times in times_seen.items():
@@ -151,12 +152,10 @@ class ConcertListViewConcertsPerYear(ConcertListView):
                 self.concerts = 0
                 self.festivals = set()
 
-        year_map: dict[int, YearValues] = dict()
+        year_map = collections.defaultdict(YearValues)
 
         for concert in concert_list_model.get_concerts():
-            year = concert.date.year
-            year_map[year] = year_map.get(year, YearValues())
-            values = year_map[year]
+            values = year_map[concert.date.year]
 
             values.bands += len(concert.bands)
             if concert.festival:
@@ -192,25 +191,27 @@ class ConcertListViewFestivals(ConcertListView):
 
     def set_model(self, concert_list_model: concert_list.ConcertListModel):
         class FestivalValues:
-            def __init__(self, concert: concert_list.Concert):
-                self.startdate = concert.date
-                self.location = concert.location
-                self.name = concert.name
+            def __init__(self):
+                self.startdate = None
                 self.bands_seen = 0
 
-        festival_map: dict[str, FestivalValues] = dict()
+        festival_map = collections.defaultdict(FestivalValues)
 
         for concert in concert_list_model.get_concerts():
             if not concert.festival:
                 continue
 
-            festival_key = str(concert.date.year) + concert.name + concert.location
-            festival_map[festival_key] = festival_map.get(festival_key, FestivalValues(concert))
-            festival_map[festival_key].bands_seen += len(concert.bands)
+            festival_key = (concert.date.year, concert.location, concert.name)
+
+            values = festival_map[festival_key]
+            if values.startdate is None:
+                values.startdate = concert.date
+            values.bands_seen += len(concert.bands)
 
         data = []
-        for values in festival_map.values():
-            data.append([values.startdate, values.location, values.name, values.bands_seen])
+        for key, values in festival_map.items():
+            year, location, name = key
+            data.append([values.startdate, location, name, values.bands_seen])
 
         self.rebuild_table(["Start date", "Location", "Name", "Bands seen"], data, 0, Qt.SortOrder.AscendingOrder)
 
@@ -220,7 +221,7 @@ class ConcertListViewLocations(ConcertListView):
         super().__init__(parent)
 
     def set_model(self, concert_list_model: concert_list.ConcertListModel):
-        location_map = dict()
+        location_map = collections.defaultdict(int)
         festival_year_set = set()
 
         for concert in concert_list_model.get_concerts():
@@ -232,7 +233,7 @@ class ConcertListViewLocations(ConcertListView):
 
                 festival_year_set.add(festival_key)
 
-            location_map[concert.location] = location_map.get(concert.location, 0) + 1
+            location_map[concert.location] += 1
 
         data = []
         for location, count in location_map.items():
