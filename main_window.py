@@ -5,6 +5,7 @@ import concert_adder
 import concert_list
 import concert_list_view
 import settings
+import version_info_window
 
 
 class ErrorHandler:
@@ -55,6 +56,15 @@ class MainWindow(QFrame):
         create_button(self, "Grid", lambda: self.show_view(concert_list_view.ConcertListViewGrid(self)))
 
         toolbar_layout.addStretch()
+
+        app_menu = QMenu()
+        about_action = app_menu.addAction("About...")
+        about_action.triggered.connect(self.show_version_info_window)
+        app_menu_button = QToolButton(self)
+        app_menu_button.setText("…")
+        app_menu_button.setMenu(app_menu)
+        app_menu_button.setPopupMode(QToolButton.ToolButtonPopupMode.InstantPopup)
+        toolbar_layout.addWidget(app_menu_button)
 
         layout = QVBoxLayout(self)
         layout.addLayout(toolbar_layout)
@@ -119,3 +129,7 @@ class MainWindow(QFrame):
         self.adder.set_added_callback(self.save_file)
         if self.isVisible():
             self.adder.show()
+
+    def show_version_info_window(self):
+        self.version_info_window = version_info_window.VersionInfoWindow(self)
+        self.version_info_window.show()
