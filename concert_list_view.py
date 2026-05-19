@@ -73,6 +73,9 @@ class ConcertListView(QFrame):
         self.table.sortItems(sort_column, sort_order)
         self.table.setSortingEnabled(True)
 
+    def rowCount(self):
+        return self.table.rowCount()
+
     def sort_table(self, sort_column: int, sort_order: Qt.SortOrder):
         self.table.sortItems(sort_column, sort_order)
 

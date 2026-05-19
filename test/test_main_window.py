@@ -62,36 +62,36 @@ class TestMainWindow(unittest.TestCase):
             settings = MockSettings()
             window = main_window.MainWindow(settings)
             window.load_filepath_from_settings()
-            self.assertEqual(window.concert_list_view.table.rowCount(), 0)
+            self.assertEqual(window.concert_list_view.rowCount(), 0)
 
             # start clean and add first band
 
             self.add_concert(window, concerts[0])
-            self.assertEqual(window.concert_list_view.table.rowCount(), 1)
+            self.assertEqual(window.concert_list_view.rowCount(), 1)
 
             # actually safe the file and continue
 
             window.create_file(filepath)
 
             self.add_concert(window, concerts[1])
-            self.assertEqual(window.concert_list_view.table.rowCount(), 2)
+            self.assertEqual(window.concert_list_view.rowCount(), 2)
 
             # change view and continue
 
             window.show_view(concert_list_view.ConcertListViewConcertsGroupedByBand(window))
-            self.assertEqual(window.concert_list_view.table.rowCount(), 6)
+            self.assertEqual(window.concert_list_view.rowCount(), 6)
 
             self.add_concert(window, concerts[2])
-            self.assertEqual(window.concert_list_view.table.rowCount(), 9)
+            self.assertEqual(window.concert_list_view.rowCount(), 9)
 
             window.show_view(concert_list_view.ConcertListViewUnfiltered(window))
-            self.assertEqual(window.concert_list_view.table.rowCount(), 3)
+            self.assertEqual(window.concert_list_view.rowCount(), 3)
 
             # load the file again with a fresh main window instance
 
             window = main_window.MainWindow(settings)
             window.load_filepath_from_settings()
-            self.assertEqual(window.concert_list_view.table.rowCount(), 3)
+            self.assertEqual(window.concert_list_view.rowCount(), 3)
 
     def create_good_bad_file(self, tmpdirname: str):
         good_file = os.path.join(tmpdirname, "good.yaml")
@@ -117,7 +117,7 @@ class TestMainWindow(unittest.TestCase):
 
             window.open_file(good_file)
 
-            self.assertEqual(window.concert_list_view.table.rowCount(), 5)
+            self.assertEqual(window.concert_list_view.rowCount(), 5)
             self.assertEqual(settings.get_filepath(), good_file)
             self.assertEqual(error_handler.errors, [])
 
@@ -125,7 +125,7 @@ class TestMainWindow(unittest.TestCase):
 
             # expectation: the good content is still loaded after trying to open the bad file
 
-            self.assertEqual(window.concert_list_view.table.rowCount(), 5)
+            self.assertEqual(window.concert_list_view.rowCount(), 5)
             self.assertEqual(settings.get_filepath(), good_file)
             self.assertEqual(error_handler.errors, ["ParserError"])
 
@@ -142,13 +142,13 @@ class TestMainWindow(unittest.TestCase):
 
             window.open_file(bad_file)
 
-            self.assertEqual(window.concert_list_view.table.rowCount(), 0)
+            self.assertEqual(window.concert_list_view.rowCount(), 0)
             self.assertEqual(settings.get_filepath(), "")
             self.assertEqual(error_handler.errors, ["ParserError"])
 
             window.open_file(good_file)
 
-            self.assertEqual(window.concert_list_view.table.rowCount(), 5)
+            self.assertEqual(window.concert_list_view.rowCount(), 5)
             self.assertEqual(settings.get_filepath(), good_file)
             self.assertEqual(error_handler.errors, ["ParserError"])
 
@@ -166,7 +166,7 @@ class TestMainWindow(unittest.TestCase):
             settings.set_filepath(good_file)
             window.load_filepath_from_settings()
 
-            self.assertEqual(window.concert_list_view.table.rowCount(), 5)
+            self.assertEqual(window.concert_list_view.rowCount(), 5)
             self.assertEqual(settings.get_filepath(), good_file)
             self.assertEqual(error_handler.errors, [])
 
@@ -186,7 +186,7 @@ class TestMainWindow(unittest.TestCase):
 
             # expectation: if the file cannot be restored from the settings, reset the settings entry
 
-            self.assertEqual(window.concert_list_view.table.rowCount(), 0)
+            self.assertEqual(window.concert_list_view.rowCount(), 0)
             self.assertEqual(settings.get_filepath(), "")
             self.assertEqual(error_handler.errors, ["ParserError"])
 
