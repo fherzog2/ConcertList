@@ -80,6 +80,7 @@ class NameListWidget(QFrame):
     def add_name(self):
         item = QListWidgetItem()
         item.setFlags(item.flags() | Qt.ItemFlag.ItemIsEditable)
+        item.setBackground(self.name_list.palette().alternateBase())
         self.name_list.addItem(item)
 
         # open edit widget for the new item
@@ -89,6 +90,7 @@ class NameListWidget(QFrame):
         item = QListWidgetItem()
         item.setText(name)
         item.setFlags(item.flags() | Qt.ItemFlag.ItemIsEditable)
+        item.setBackground(self.name_list.palette().alternateBase())
         self.name_list.addItem(item)
 
     def remove_name(self):

@@ -4,6 +4,7 @@ import concert_list
 import collections
 import dates_grid_view
 import datetime
+from typing import Optional
 
 
 def format_date(date: datetime.date):
@@ -53,7 +54,16 @@ class ConcertListView(QFrame):
         layout.setContentsMargins(0, 0, 0, 0)
         layout.addWidget(self.table)
 
-    def rebuild_table(self, header, data, sort_column: int, sort_order: Qt.SortOrder):
+    def rebuild_table(self, header: list[str],
+                      data: list[list[str | int | datetime.date]],
+                      use_alternate_color: Optional[list[bool]],
+                      sort_column: int, sort_order: Qt.SortOrder):
+        """
+        header: header names for each column
+        data: holds the display data for each row
+        use_alternate_color: defines for each row if the alternateBase background color should be used
+        sort_column: the new table should be initially sorted by this column
+        """
         self.table.setSortingEnabled(False)
         self.table.clear()
         self.table.setRowCount(len(data))
@@ -67,6 +77,10 @@ class ConcertListView(QFrame):
                 else:
                     item = NumericSortTableWidgetItem(str(value), self.collator)
                 item.setFlags(item.flags() & ~Qt.ItemFlag.ItemIsEditable)
+
+                if use_alternate_color and use_alternate_color[row]:
+                    item.setBackground(self.table.palette().alternateBase())
+
                 self.table.setItem(row, column, item)
 
         self.table.resizeColumnsToContents()
@@ -102,10 +116,12 @@ class ConcertListViewUnfiltered(ConcertListView):
 
     def set_model(self, concert_list_model: concert_list.ConcertListModel):
         data = []
+        use_alternate_color = []
         for concert in concert_list_model.get_concerts():
             data.append([concert.date, concert.location, concert.name, ", ".join(concert.bands)])
+            use_alternate_color.append(concert.festival)
 
-        self.rebuild_table(["Date", "Location", "Name", "Bands"], data, 0, Qt.SortOrder.DescendingOrder)
+        self.rebuild_table(["Date", "Location", "Name", "Bands"], data, use_alternate_color, 0, Qt.SortOrder.DescendingOrder)
 
 
 class ConcertListViewConcertsGroupedByBand(ConcertListView):
@@ -114,11 +130,13 @@ class ConcertListViewConcertsGroupedByBand(ConcertListView):
 
     def set_model(self, concert_list_model: concert_list.ConcertListModel):
         data = []
+        use_alternate_color = []
         for concert in concert_list_model.get_concerts():
             for band in concert.bands:
                 data.append([concert.date, concert.location, concert.name, band])
+                use_alternate_color.append(concert.festival)
 
-        self.rebuild_table(["Date", "Location", "Name", "Band"], data, 3, Qt.SortOrder.AscendingOrder)
+        self.rebuild_table(["Date", "Location", "Name", "Band"], data, use_alternate_color, 3, Qt.SortOrder.AscendingOrder)
 
 
 class ConcertListViewMostSeenBands(ConcertListView):
@@ -139,7 +157,7 @@ class ConcertListViewMostSeenBands(ConcertListView):
         # primarily sort by times seen
         # but also sort by band names within each group
 
-        self.rebuild_table(["Band", "Times Seen"], data, 0, Qt.SortOrder.AscendingOrder)
+        self.rebuild_table(["Band", "Times Seen"], data, None, 0, Qt.SortOrder.AscendingOrder)
         self.sort_table(1, Qt.SortOrder.DescendingOrder)
 
 
@@ -185,7 +203,7 @@ class ConcertListViewConcertsPerYear(ConcertListView):
 
         data.append(["Total", total_bands, len(total_distinct_bands), total_concerts, total_festivals])
 
-        self.rebuild_table(["Year", "Bands", "Distinct Bands", "Concerts", "Festivals"], data, 0, Qt.SortOrder.AscendingOrder)
+        self.rebuild_table(["Year", "Bands", "Distinct Bands", "Concerts", "Festivals"], data, None, 0, Qt.SortOrder.AscendingOrder)
 
 
 class ConcertListViewFestivals(ConcertListView):
@@ -216,7 +234,7 @@ class ConcertListViewFestivals(ConcertListView):
             year, location, name = key
             data.append([values.startdate, location, name, values.bands_seen])
 
-        self.rebuild_table(["Start date", "Location", "Name", "Bands seen"], data, 0, Qt.SortOrder.AscendingOrder)
+        self.rebuild_table(["Start date", "Location", "Name", "Bands seen"], data, None, 0, Qt.SortOrder.AscendingOrder)
 
 
 class ConcertListViewLocations(ConcertListView):
@@ -242,7 +260,7 @@ class ConcertListViewLocations(ConcertListView):
         for location, count in location_map.items():
             data.append([location, count])
 
-        self.rebuild_table(["Location", "Concerts"], data, 0, Qt.SortOrder.AscendingOrder)
+        self.rebuild_table(["Location", "Concerts"], data, None, 0, Qt.SortOrder.AscendingOrder)
 
 
 class ConcertListViewGrid(QFrame):
