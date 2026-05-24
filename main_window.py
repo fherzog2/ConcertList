@@ -1,5 +1,6 @@
 import os
 from PyQt6.QtCore import *
+from PyQt6.QtGui import *
 from PyQt6.QtWidgets import *
 import concert_adder
 import concert_list
@@ -57,7 +58,8 @@ class MainWindow(QFrame):
 
         toolbar_layout.addStretch()
 
-        app_menu = QMenu()
+        app_menu = QMenu(self)
+        self.recent_files_menu = app_menu.addMenu("Recent files")
         about_action = app_menu.addAction("About...")
         about_action.triggered.connect(self.show_version_info_window)
         app_menu_button = QToolButton(self)
@@ -71,6 +73,7 @@ class MainWindow(QFrame):
         default_view_button.click()
 
         self.settings.restore_window_geometry("MainWindow", self)
+        self.update_recent_files_menu()
 
     def hideEvent(self, event):
         self.settings.save_window_geometry("MainWindow", self)
@@ -89,10 +92,21 @@ class MainWindow(QFrame):
         self.concert_list_view.set_model(self.model)
         self.setWindowTitle(f"{QCoreApplication.applicationName()} - {path}")
 
+    def update_recent_files_menu(self):
+        recent_files = self.settings.get_recent_files()
+
+        self.recent_files_menu.clear()
+        for f in recent_files:
+            action = self.recent_files_menu.addAction(f)
+            action.triggered.connect(self.open_recent_file)
+        self.recent_files_menu.setEnabled(len(recent_files) > 0)
+
     def create_file(self, path: str):
         self.model.save_file(path)
         self.set_filepath(path)
         self.settings.set_filepath(path)
+        self.settings.push_recent_file(path)
+        self.update_recent_files_menu()
 
     def create_file_interactive(self):
         path = QFileDialog.getSaveFileName(filter="Concert list (*.yaml)")[0]
@@ -103,8 +117,14 @@ class MainWindow(QFrame):
         try:
             self.set_filepath(path)
             self.settings.set_filepath(path)
+            self.settings.push_recent_file(path)
+            self.update_recent_files_menu()
         except Exception as e:
             self.error_handler.error_occured(self, str(e.__class__.__name__), str(e))
+
+    def open_recent_file(self):
+        action: QAction = self.sender()
+        self.open_file(action.text())
 
     def open_file_interactive(self):
         path = QFileDialog.getOpenFileName(filter="Concert list (*.yaml)")[0]

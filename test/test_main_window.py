@@ -12,12 +12,23 @@ from PyQt6.QtWidgets import *
 class MockSettings:
     def __init__(self):
         self.filepath = ""
+        self.recent_files = []
 
     def set_filepath(self, filepath: str):
         self.filepath = filepath
 
     def get_filepath(self) -> str:
         return self.filepath
+
+    def push_recent_file(self, filepath: str):
+        try:
+            self.recent_files.remove(filepath)
+        except ValueError:
+            pass
+        self.recent_files.insert(0, filepath)
+
+    def get_recent_files(self) -> list[str]:
+        return self.recent_files
 
     def save_window_geometry(self, name, widget):
         pass
@@ -93,14 +104,19 @@ class TestMainWindow(unittest.TestCase):
             window.load_filepath_from_settings()
             self.assertEqual(window.concert_list_view.rowCount(), 3)
 
-    def create_good_bad_file(self, tmpdirname: str):
-        good_file = os.path.join(tmpdirname, "good.yaml")
-        bad_file = os.path.join(tmpdirname, "bad.yaml")
+    def create_file(self, tmpdirname: str, name: str, concerts) -> str:
+        filepath = os.path.join(tmpdirname, name)
 
         model = concert_list.ConcertListModel()
-        model.set_concerts(example_data.get_example_concerts())
-        model.save_file(good_file)
+        model.set_concerts(concerts)
+        model.save_file(filepath)
 
+        return filepath
+
+    def create_good_bad_file(self, tmpdirname: str):
+        good_file = self.create_file(tmpdirname, "good.yaml", example_data.get_example_concerts())
+
+        bad_file = os.path.join(tmpdirname, "bad.yaml")
         with open(bad_file, "w") as f:
             f.write(",.-#+#+ bad file")
 
@@ -191,3 +207,41 @@ class TestMainWindow(unittest.TestCase):
             self.assertEqual(error_handler.errors, ["ParserError"])
 
             window.save_file()
+
+    def test_recent_files(self):
+        with tempfile.TemporaryDirectory() as tmpdirname:
+            file1 = self.create_file(tmpdirname, "file1.yaml", example_data.get_example_concerts())
+            file2 = self.create_file(tmpdirname, "file2.yaml", example_data.get_example_concerts()[:1])
+
+            app = QApplication([])
+            settings = MockSettings()
+            window = main_window.MainWindow(settings)
+
+            window.open_file(file1)
+            self.assertEqual(window.concert_list_view.rowCount(), 5)
+            window.open_file(file2)
+            self.assertEqual(window.concert_list_view.rowCount(), 1)
+
+            # switch back to file1
+            window.recent_files_menu.actions()[1].trigger()
+            self.assertEqual(window.concert_list_view.rowCount(), 5)
+
+            # open file1 again
+            window.recent_files_menu.actions()[0].trigger()
+            self.assertEqual(window.concert_list_view.rowCount(), 5)
+            window.recent_files_menu.actions()[0].trigger()
+            self.assertEqual(window.concert_list_view.rowCount(), 5)
+            window.recent_files_menu.actions()[0].trigger()
+            self.assertEqual(window.concert_list_view.rowCount(), 5)
+
+            # file2
+            window.recent_files_menu.actions()[1].trigger()
+            self.assertEqual(window.concert_list_view.rowCount(), 1)
+
+            # file1
+            window.recent_files_menu.actions()[1].trigger()
+            self.assertEqual(window.concert_list_view.rowCount(), 5)
+
+            # file2
+            window.recent_files_menu.actions()[1].trigger()
+            self.assertEqual(window.concert_list_view.rowCount(), 1)
