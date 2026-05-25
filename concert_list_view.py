@@ -72,6 +72,9 @@ class ConcertListView(QFrame):
 
         for row, row_data in enumerate(data):
             for column, value in enumerate(row_data):
+                if isinstance(value, bool):
+                    value = "✓" if value else "✗"
+
                 if isinstance(value, datetime.date):
                     item = DateTableWidgetItem(value)
                 else:
@@ -118,10 +121,10 @@ class ConcertListViewUnfiltered(ConcertListView):
         data = []
         use_alternate_color = []
         for concert in concert_list_model.get_concerts():
-            data.append([concert.date, concert.location, concert.name, ", ".join(concert.bands)])
+            data.append([concert.date, concert.location, concert.name, concert.festival, ", ".join(concert.bands)])
             use_alternate_color.append(concert.festival)
 
-        self.rebuild_table(["Date", "Location", "Name", "Bands"], data, use_alternate_color, 0, Qt.SortOrder.DescendingOrder)
+        self.rebuild_table(["Date", "Location", "Name", "Festival", "Bands"], data, use_alternate_color, 0, Qt.SortOrder.DescendingOrder)
 
 
 class ConcertListViewConcertsGroupedByBand(ConcertListView):
@@ -133,10 +136,10 @@ class ConcertListViewConcertsGroupedByBand(ConcertListView):
         use_alternate_color = []
         for concert in concert_list_model.get_concerts():
             for band in concert.bands:
-                data.append([concert.date, concert.location, concert.name, band])
+                data.append([concert.date, concert.location, concert.name, concert.festival, band])
                 use_alternate_color.append(concert.festival)
 
-        self.rebuild_table(["Date", "Location", "Name", "Band"], data, use_alternate_color, 3, Qt.SortOrder.AscendingOrder)
+        self.rebuild_table(["Date", "Location", "Name", "Festival", "Band"], data, use_alternate_color, 4, Qt.SortOrder.AscendingOrder)
 
 
 class ConcertListViewMostSeenBands(ConcertListView):

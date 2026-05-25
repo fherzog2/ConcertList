@@ -21,31 +21,31 @@ class TestConcertListView(unittest.TestCase):
     def test_default_view(self):
         app = TestApp()
         app.show_view(concert_list_view.ConcertListViewUnfiltered(None))
-        expected = r"""Date;Location;Name;Bands
-29.06.2024;Clisson;Hellfest;Mammoth WVH, Kataklysm, Metallica
-28.06.2024;Clisson;Hellfest;Fear Factory, Machine Head, The Prodigy
-24.05.2024;München, Olympiastadion;;Mammoth WVH, Architects, Metallica
-02.02.2024;Hamburg, Grosse Freiheit 36;;Chaosbay, Flash Forward, Emil Bulls
-02.02.2024;Hamburg, Gruenspan;;Any Given Day"""
+        expected = r"""Date;Location;Name;Festival;Bands
+29.06.2024;Clisson;Hellfest;✓;Mammoth WVH, Kataklysm, Metallica
+28.06.2024;Clisson;Hellfest;✓;Fear Factory, Machine Head, The Prodigy
+24.05.2024;München, Olympiastadion;;✗;Mammoth WVH, Architects, Metallica
+02.02.2024;Hamburg, Grosse Freiheit 36;;✗;Chaosbay, Flash Forward, Emil Bulls
+02.02.2024;Hamburg, Gruenspan;;✗;Any Given Day"""
         self.assertEqual(app.view.dump(), expected)
 
     def test_concerts_grouped_by_band(self):
         app = TestApp()
         app.show_view(concert_list_view.ConcertListViewConcertsGroupedByBand(None))
-        expected = r"""Date;Location;Name;Band
-02.02.2024;Hamburg, Gruenspan;;Any Given Day
-24.05.2024;München, Olympiastadion;;Architects
-02.02.2024;Hamburg, Grosse Freiheit 36;;Chaosbay
-02.02.2024;Hamburg, Grosse Freiheit 36;;Emil Bulls
-28.06.2024;Clisson;Hellfest;Fear Factory
-02.02.2024;Hamburg, Grosse Freiheit 36;;Flash Forward
-29.06.2024;Clisson;Hellfest;Kataklysm
-28.06.2024;Clisson;Hellfest;Machine Head
-24.05.2024;München, Olympiastadion;;Mammoth WVH
-29.06.2024;Clisson;Hellfest;Mammoth WVH
-24.05.2024;München, Olympiastadion;;Metallica
-29.06.2024;Clisson;Hellfest;Metallica
-28.06.2024;Clisson;Hellfest;The Prodigy"""
+        expected = r"""Date;Location;Name;Festival;Band
+02.02.2024;Hamburg, Gruenspan;;✗;Any Given Day
+24.05.2024;München, Olympiastadion;;✗;Architects
+02.02.2024;Hamburg, Grosse Freiheit 36;;✗;Chaosbay
+02.02.2024;Hamburg, Grosse Freiheit 36;;✗;Emil Bulls
+28.06.2024;Clisson;Hellfest;✓;Fear Factory
+02.02.2024;Hamburg, Grosse Freiheit 36;;✗;Flash Forward
+29.06.2024;Clisson;Hellfest;✓;Kataklysm
+28.06.2024;Clisson;Hellfest;✓;Machine Head
+24.05.2024;München, Olympiastadion;;✗;Mammoth WVH
+29.06.2024;Clisson;Hellfest;✓;Mammoth WVH
+24.05.2024;München, Olympiastadion;;✗;Metallica
+29.06.2024;Clisson;Hellfest;✓;Metallica
+28.06.2024;Clisson;Hellfest;✓;The Prodigy"""
         self.assertEqual(app.view.dump(), expected)
 
     def test_most_seen_bands(self):
